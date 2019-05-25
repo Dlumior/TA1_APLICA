@@ -1,5 +1,6 @@
 Ruta encontrada: ['go689935073', 'go689935077', 'go105983726', 'go104572610', 'go104572618', 'go105938047', 'go105012342', 'go105938052', 'go105096416', 'go105012740']
-Costo de la ruta encontrada 0.7151422043104001
-Numero de nodos en la ruta encontrada 10
-Numero de nodos visitados: 49036
-Numero de nodos en memoria: 49048
+Costo de la ruta encontrada:         0.72
+Numero de nodos en la ruta encontrada: 10
+Numero de nodos visitados:          49036
+Numero de nodos en memoria:         49048
+Tiempo de ejecucion:        28.4294402599

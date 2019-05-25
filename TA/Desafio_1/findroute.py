@@ -1,4 +1,5 @@
 import sys
+import time
 """
 import time
 import numpy as np
@@ -23,87 +24,105 @@ if __name__=="__main__":
 
 	args = readCommand( sys.argv[1:] )
 
+	#---------------------------------------------------------------------------------------------------------------------------
 
 	"""Instancia el problema de busqueda con nodo inicial 'nodoI' y nodo objetivo 'nodoF'"""
 	map_problem = MapSearchProblem(args['nodoI'], args['nodoF'], args['mapa'], args['heuristica'])
 
+	#---------------------------------------------------------------------------------------------------------------------------
+
 	if(args['busqueda']=='bfs'):
 		"""Ejecutar busqueda en Amplitud (BFS) """
+		t_inicio = time.time()
 		node_solucionBFS,nodos_visitados,nodos_en_memoria = graph_search(map_problem, FIFOQueue())
+		t_final = time.time()
+
 		if node_solucionBFS!=None:
 			print( 'Ruta encontrada: {}'.format(node_solucionBFS.solution()))
-			print( 'Costo de la ruta encontrada {}'.format(node_solucionBFS.path_cost))
-			print( 'Numero de nodos en la ruta encontrada {}'.format(len(node_solucionBFS.solution())))
-			print( 'Numero de nodos visitados: {}'.format(nodos_visitados) )
-			print( 'Numero de nodos en memoria: {}'.format(nodos_en_memoria))
+			print( 'Costo de la ruta encontrada: {:12.2f}'.format(node_solucionBFS.path_cost))
+			print( 'Numero de nodos en la ruta encontrada: {:2}'.format(len(node_solucionBFS.solution())))
+			print( 'Numero de nodos visitados: {:14}'.format(nodos_visitados) )
+			print( 'Numero de nodos en memoria: {:13}'.format(nodos_en_memoria))
+			print( 'Tiempo de ejecucion: {:20.10f}'.format(t_final-t_inicio))
 		else:
 			print("No hay solución BFS")
 
+	#---------------------------------------------------------------------------------------------------------------------------
+
 	if(args['busqueda']=='dfs'):
 		"""Ejecutar busqueda en Profundidad (DFS) """
+		t_inicio = time.time()
 		node_solucionDFS,nodos_visitados,nodos_en_memoria = graph_search(map_problem, [])
+		t_final = time.time()
+
 		if node_solucionDFS!=None:
 			print( 'Ruta encontrada: {}'.format(node_solucionDFS.solution()) )
-			print( 'Costo de la ruta encontrada {}'.format(node_solucionDFS.path_cost))
-			print( 'Numero de nodos en la ruta encontrada {}'.format(len(node_solucionDFS.solution())))
-			print( 'Numero de nodos visitados: {}'.format(nodos_visitados) )
-			print( 'Numero de nodos en memoria: {}'.format(nodos_en_memoria))
+			print( 'Costo de la ruta encontrada: {:12.2f}'.format(node_solucionDFS.path_cost))
+			print( 'Numero de nodos en la ruta encontrada: {:2}'.format(len(node_solucionDFS.solution())))
+			print( 'Numero de nodos visitados: {:14}'.format(nodos_visitados) )
+			print( 'Numero de nodos en memoria: {:13}'.format(nodos_en_memoria))
+			print( 'Tiempo de ejecucion: {:20.10f}'.format(t_final-t_inicio))
 		else:
 			print("No hay solución DFS")
 
+	#---------------------------------------------------------------------------------------------------------------------------
+
 	if(args['busqueda']=='ids'):
 		"""Ejecutar busqueda iterativa en Profundidad (IDS) """
+		t_inicio = time.time()
 		node_solucionIDS,nodos_visitados, nodos_en_memoria = iterative_deeping_search(map_problem)
+		t_final = time.time()
+
 		if node_solucionIDS!=None:
 			print( 'Ruta encontrada: {}'.format(node_solucionIDS.solution()) )
-			print( 'Costo de la ruta encontrada {}'.format(node_solucionIDS.path_cost))
-			print( 'Numero de nodos en la ruta encontrada {}'.format(len(node_solucionIDS.solution())))
-			print( 'Nro de nodos visitados: {}'.format(nodos_visitados) )
-			print( 'Nro de nodos en memoria: {}'.format(nodos_en_memoria))
+			print( 'Costo de la ruta encontrada: {:12.2f}'.format(node_solucionIDS.path_cost))
+			print( 'Numero de nodos en la ruta encontrada: {:2}'.format(len(node_solucionIDS.solution())))
+			print( 'Numero de nodos visitados: {:14}'.format(nodos_visitados) )
+			print( 'Numero de nodos en memoria: {:13}'.format(nodos_en_memoria))
+			print( 'Tiempo de ejecucion: {:20.10f}'.format(t_final-t_inicio))
 		else:
 			print("No hay solución IDS")
 
+	#---------------------------------------------------------------------------------------------------------------------------
+
 	if(args['busqueda']=='bis'):
 		"""Ejecutar busqueda Bidireccional (BIS) """
+		t_inicio = time.time()
 		node_solucionBIS1, node_solucionBIS2= bidirectional_search(map_problem,FIFOQueue(),[])
+		t_final = time.time()
 		nodos_visitados=[] #Falta implementar=================================================================
 		nodos_en_memoria=[] #Falta implementar================================================================
+
 		if node_solucionBIS1!=None:
+			solucion = list()
+			solucion = combinarSoluciones(node_solucionBIS1,node_solucionBIS2)
 
-			solucion1=node_solucionBIS1.solution()
-			solucion2=node_solucionBIS2.solution()
-
-			solv=[]
-			cant=len(solucion2)
-			for i in range(cant):
-				c1=solucion2.pop()
-				solv.append(c1)
-			
-			respuesta= solucion1+solv
-			solucion3=[]
-			for i in respuesta:
-				if i not in solucion3:
-					solucion3.append(i)
-			
-			print( 'Ruta encontrada: {}'.format(solucion3) )
-			print( 'Costo de la ruta encontrada {}'.format(node_solucionBIS1.path_cost+node_solucionBIS2.path_cost))
-			print( 'Numero de nodos en la ruta encontrada {}'.format(len(solucion3)))
-			print( 'Numero de nodos visitados: {}'.format(nodos_visitados) )
-			print( 'Numero de nodos en memoria: {}'.format(nodos_en_memoria))
+			print( 'Ruta encontrada: {}'.format(solucion) )
+			print( 'Costo de la ruta encontrada: {:12.2f}'.format(node_solucionBIS1.path_cost+node_solucionBIS2.path_cost))
+			print( 'Numero de nodos en la ruta encontrada: {:2}'.format(len(solucion)))
+			print( 'Numero de nodos visitados: {:14}'.format(len(nodos_visitados) ))
+			print( 'Numero de nodos en memoria: {:13}'.format(len(nodos_en_memoria)))
+			print( 'Tiempo de ejecucion: {:20.10f}'.format(t_final-t_inicio))
 		else:
 			print("No hay solución BIS")
+	
+	#---------------------------------------------------------------------------------------------------------------------------
 
 	if(args['busqueda']=='astar'):
 		"""Ejecutar busqueda A* """
-
-		node_solucionASTAR, nodos_visitados=astar_search(map_problem,h1)
+		t_inicio = time.time()
+		node_solucionASTAR=astar_search(map_problem,h1)
+		t_final = time.time()
+		nodos_visitados = []
 		nodos_en_memoria=[] #Falta implementar================================================================
+
 		if node_solucionASTAR!=None:
 			print( 'Ruta encontrada: {}'.format(node_solucionASTAR.solution()) )
-			print( 'Costo de la ruta encontrada: {}'.format(node_solucionASTAR.path_cost))
-			print( 'Numero de nodos en la ruta encontrada: {}'.format(len(node_solucionASTAR.solution())))
-			print( 'Nro de nodos visitados: {}'.format(nodos_visitados) )
-			print( 'Nro de nodos en memoria: {}'.format(nodos_en_memoria))
+			print( 'Costo de la ruta encontrada: {:12.2f}'.format(node_solucionASTAR.path_cost))
+			print( 'Numero de nodos en la ruta encontrada: {:2}'.format(len(node_solucionASTAR.solution())))
+			print( 'Numero de nodos visitados: {:14}'.format(len(nodos_visitados) ) )
+			print( 'Numero de nodos en memoria: {:13}'.format(len(nodos_en_memoria)))
+			print( 'Tiempo de ejecucion: {:20.10f}'.format(t_final-t_inicio))
 		else:
 			print("No hay solucion Astar")
 #____________________________________________________________________________________________________________________________

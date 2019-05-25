@@ -49,7 +49,7 @@ def readCommand( argv ):
 
 		heuristica = dict()
 		for nodo in h_pitts:
-			heuristica[int(nodo[0])]=float(nodo[0])
+			heuristica[int(nodo[0])]=float(nodo[1])
 
 	args = dict()
 	args['mapa'] = mapa
