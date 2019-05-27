@@ -6,7 +6,11 @@ from copy import deepcopy
 from math import exp
 import random
 import matplotlib.pyplot as plt
+
 """gaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"""
+cant_llamadas = 0 
+maxScore = 0
+
 def evaluate_population(population, fitness_fn):
     """ Evalua una poblacion de individuos con la funcion de fitness pasada """
     popsize = len(population)
@@ -95,11 +99,17 @@ def randomAssign(puzzle, initialEntries):
 			puzzle[ind]=value
 ####################################################################################################################
 def score_board(puzzle):#calcula el fitness
+	global cant_llamadas
+	global maxScore
 	score = 0
 	for row in range(9): # por cada fila obtiene la cantidad de numeros diferentes
 		score-= len(set(puzzle[get_row_indices(row, type="row index")]))
 	for col in range(9): # por cada columna obtiene la cantidad de numeros diferentes
 		score -= len(set(puzzle[get_column_indices(col,type="column index")]))
+	if score < maxScore :
+		maxScore = score
+		cant_llamadas += 1
+
 	return score
 
 def make_neighborBoard(puzzle, initialEntries):
@@ -143,7 +153,7 @@ def sa_solver(puzzle, strParameters):
 	initialEntries = np.arange(81)[puzzle > 0]  # las posiciones no vacias del puzzle
 	randomAssign(puzzle, initialEntries)  # En cada box del puzzle asigna numeros aleatorios en pociciones vacias, garantizando que sean los 9 numeros diferentes
 	best_puzzle = deepcopy(puzzle)
-	current_score = score_board(puzzle)
+	current_score = (puzzle)
 	best_score = current_score
 	T = float(parameters['T0'])  # El valor inicial de la temperatura
 	DR = float(parameters['DR']) # El factor de decaimiento de la temperatura
@@ -299,6 +309,7 @@ def ga_solver(puzzle, strParameters):
 	ibest = sorted(range(len(population)), key=lambda i: population[i].fitness, reverse=False)[:1]
 	bestfitness = [population[ibest[0]].fitness]
 	print("Poblacion inicial, best_fitness = {}".format(population[ibest[0]].fitness))
+
 	#dentro de la parte def genetic_algorithm
 	#------------------------------------------------------------
 	fitnessAnterior = 0
@@ -332,18 +343,21 @@ def ga_solver(puzzle, strParameters):
 		ibest = sorted(range(len(population)), key=lambda i: population[i].fitness, reverse=False)[:1]
 		bestfitness.append(population[ibest[0]].fitness)
 		if population[ibest[0]].fitness<fitnessAnterior:
-			print("generacion {}, best_fitness = {}".format(g, population[ibest[0]].fitness))
+			print("generacion {}, best_fitness = {}, cantidad de llamadas a score_board= {}".format(g, population[ibest[0]].fitness,cant_llamadas))
 			fitnessAnterior = population[ibest[0]].fitness
 
 	end_time = time.time()
-	print("=================SUDOKU FINAL====================")
-	showPuzzle(population[ibest[0]].chromosome)
-	print("Fitness = {}".format(population[ibest[0]].fitness))
-	pass
-	print ("It took {} seconds to solve this puzzle.".format(end_time - start_time))
-
-
-	return population[ibest[0]], bestfitness
+	if population[ibest[0]].fitness == -162:
+		print ("========= SOLUCION ===========")
+		showPuzzle(population[ibest[0]].chromosome)
+		print("Fitness = {}".format(population[ibest[0]].fitness))
+		print ("It took {} seconds to solve this puzzle.".format(end_time - start_time))
+	else:
+		print("======== SUDOKU FINAL =========")
+		showPuzzle(population[ibest[0]].chromosome)
+		print("Fitness = {}".format(population[ibest[0]].fitness))
+		print ("It took {} seconds".format(end_time - start_time))
+		print("Couldn't solve! ({}/{} points). It's a random algorithm so try again.".format(population[ibest[0]].fitness,-162))
 
 
 ##-------------------------------------------------------------------------------------------------------------------
@@ -381,6 +395,8 @@ def readCommand( argv ):
 	return args
 
 if __name__=="__main__":
+
+
 	"""
 	The main function called when sudokusolver.py is run from the command line:
 	> python sudokusolver.py
@@ -388,7 +404,9 @@ if __name__=="__main__":
 	See the usage string for more details.
 
 	> python sudokusolver.py --help
+
     """
+
 	args = readCommand( sys.argv[1:] ) # Get the arguments from the command line input
 	solvers = {'sa': sa_solver,	'ga': ga_solver }  # Dictionary of available solvers
 
