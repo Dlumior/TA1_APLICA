@@ -1,15 +1,6 @@
 import sys
-import bisect
-import collections
-import collections.abc
 import heapq
-import operator
-import os.path
-import random
-import math
 import functools
-import numpy as np
-from itertools import chain, combinations
 
 from Paquetes.definicionProblema import *
 
@@ -144,12 +135,15 @@ def bidirectional_search(problem, frontierA, frontierP):
         for i in frontierP:
             fronteraP.append(i.state)
 
+        cantNodosVisitado = len(nodos_visitadosA)+len(nodos_visitadosP)
+        cantNodosMemoria = cantNodosVisitado + len(frontierA) + len(frontierP)
+
         if len(intrs1)!=0:#primero vemos si sse cruzan en los explorados de A
-            return intrs1[0], intrs2[0]
+            return (intrs1[0], intrs2[0]), cantNodosVisitado, cantNodosMemoria
         if len(intrs3)!=0:#Luego vemos si sse cruzan en los explorados de P
-            return intrs3[0], intrs4[0]
+            return (intrs3[0], intrs4[0]), cantNodosVisitado, cantNodosMemoria
         if len(intrs5)!=0:# Al ultimo vemos si se estan cruzando las fronteras
-            return intrs5[0], intrs6[0]
+            return (intrs5[0], intrs6[0]), cantNodosVisitado, cantNodosMemoria
 
         nodeA = frontierA.pop()
         listaVisitadosA.append(nodeA.state)
@@ -172,7 +166,7 @@ def bidirectional_search(problem, frontierA, frontierP):
         frontierP.extend(   child for child in nodeP.expand(problem)
                             if( (child.state not in exploredP) and (child.state not in (ndo.state for ndo in frontierP)) )    )
 
-    return None,None
+    return (None,None), cantNodosVisitado, cantNodosMemoria
 
 def combinarSoluciones(node_solucionBIS1,node_solucionBIS2):
     solucion1=node_solucionBIS1.solution()
@@ -193,80 +187,7 @@ def combinarSoluciones(node_solucionBIS1,node_solucionBIS2):
     return solucion3
 #____________________________________________________________________________________________________________________________
 
-import heapq
-class FrontierPQ:
-    """Una Frontera ordenada por una funcion de costo (Priority Queue)"""
-    
-    def __init__(self, initial, costfn=lambda node: node.path_cost):
-        "Inicializa la Frontera con un nodo inicial y una funcion de costo especificada (por defecto es el costo de camino)."
-        self.heap   = []
-        self.states = {}
-        self.costfn = costfn
-        self.add(initial)
-    
-    def add(self, node):
-        "Agrega un nodo a la frontera."
-        cost = self.costfn(node)
-        heapq.heappush(self.heap, (cost, node))
-        self.states[node.state] = node
-        
-    def pop(self):
-        "Remueve y retorna el nodo con minimo costo."
-        (cost, node) = heapq.heappop(self.heap)
-        self.states.pop(node.state, None) # remove state
-        return node
-    
-    def replace(self, node):
-        "node reemplaza al nodo de la Fontera que tiene el mismo estado que node."
-        if node.state not in self:
-            raise ValueError('{} no tiene nada que reemplazar'.format(node.state))
-        for (i, (cost, old_node)) in enumerate(self.heap):
-            if old_node.state == node.state:
-                self.heap[i] = (self.costfn(node), node)
-                heapq._siftdown(self.heap, 0, i)
-                return
-
-    def __contains__(self, state): return state in self.states
-    
-    def __len__(self): return len(self.heap)
-"""
-class cola_de_prioridad:
-
-    def __init__(self, ,dato, costoFn=lambda node: node.path_cost):
-        self.cola = queue.PriorityQueue()
-"""
-"""
-def best_first_graph_search(problem, f):
-    "" Busca el objetivo expandiendo el nodo de la frontera con el menor valor de la funcion f. Memoriza estados visitados
-        Antes de llamar a este algoritmo hay que especificar La funcion f(node). Si f es node.depth tenemos Busqueda en Amplitud; 
-        si f es node.path_cost tenemos Busqueda  de Costo Uniforme. Si f es una heurística tenemos Busqueda Voraz;
-        Si f es node.path_cost + heuristica(node) tenemos A*
-    ""
-
-    #frontier = FrontierPQ( Node(problem.initial), f )  # frontera tipo cola de prioridad ordenada por f
-    frontier = queue.PriorityQueue()
-    frontier.put((f(Node(problem.initial)),Node(problem.initial)))
-
-    explored = set()     # memoria de estados visitados
-    visited_nodes = []   # almacena nodos visitados durante la busqueda
-    while frontier:
-        nodeT = frontier.get()  #retorn una tupla con el peso y su valor  e.g. (f, Node)
-        node = nodeT[1] # Obtenemos el nodo de la tupla
-        visited_nodes.append(node)        
-        if problem.goal_test(node.state):
-            return node, visited_nodes
-        explored.add(node.state)
-        for action in problem.actions(node.state):
-            child = node.child_node(problem, action)
-            peso = f(child)
-            if child.state not in explored and child.state not in frontier:
-                frontier.add(child)
-            elif child.state in frontier:
-                incumbent = frontier.states[child.state] 
-                if f(child) < f(incumbent):
-                    frontier.replace(child)
-    return None,visited_nodes
-"""
+#Codigo de search.py de aima-python
 
 def memoize(fn, slot=None, maxsize=32):
     """Memoize fn: make it remember the computed value for any argument list.
@@ -359,10 +280,12 @@ def best_first_graph_search(problem, f):
     frontier = PriorityQueue('min', f)
     frontier.append(node)
     explored = set()
+    nodos_visitados=0;
     while frontier:
         node = frontier.pop()
+        nodos_visitados+=1
         if problem.goal_test(node.state):
-            return node
+            return node,nodos_visitados,nodos_visitados+len(frontier)
         explored.add(node.state)
         for child in node.expand(problem):
             if child.state not in explored and child not in frontier:
@@ -371,7 +294,7 @@ def best_first_graph_search(problem, f):
                 if f(child) < frontier[child]:
                     del frontier[child]
                     frontier.append(child)
-    return None
+    return None,nodos_visitados,nodos_visitados+len(frontier) 
 
 def astar_search(problem, heuristic):
     """Algoritmo A*, un caso especial de best_first_graph_search con f = path_cost + heuristic"""

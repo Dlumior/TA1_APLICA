@@ -88,20 +88,18 @@ if __name__=="__main__":
 	if(args['busqueda']=='bis'):
 		"""Ejecutar busqueda Bidireccional (BIS) """
 		t_inicio = time.time()
-		node_solucionBIS1, node_solucionBIS2= bidirectional_search(map_problem,FIFOQueue(),[])
+		node_solucionBIS, nodos_visitados, nodos_en_memoria= bidirectional_search(map_problem,FIFOQueue(),[])
 		t_final = time.time()
-		nodos_visitados=[] #Falta implementar=================================================================
-		nodos_en_memoria=[] #Falta implementar================================================================
 
-		if node_solucionBIS1!=None:
+		if node_solucionBIS[0]!=None:
 			solucion = list()
-			solucion = combinarSoluciones(node_solucionBIS1,node_solucionBIS2)
+			solucion = combinarSoluciones(node_solucionBIS[0],node_solucionBIS[1])
 
 			print( 'Ruta encontrada: {}'.format(solucion) )
-			print( 'Costo de la ruta encontrada: {:12.2f}'.format(node_solucionBIS1.path_cost+node_solucionBIS2.path_cost))
-			print( 'Numero de nodos en la ruta encontrada: {:2}'.format(len(solucion)))
-			print( 'Numero de nodos visitados: {:14}'.format(len(nodos_visitados) ))
-			print( 'Numero de nodos en memoria: {:13}'.format(len(nodos_en_memoria)))
+			print( 'Costo de la ruta encontrada: {:12.2f}'.format(node_solucionBIS[0].path_cost+node_solucionBIS[1].path_cost))
+			print( 'Numero de nodos en la ruta encontrada: {:2}'.format(len(solucion)+1))
+			print( 'Numero de nodos visitados: {:14}'.format(nodos_visitados ))
+			print( 'Numero de nodos en memoria: {:13}'.format(nodos_en_memoria))
 			print( 'Tiempo de ejecucion: {:20.10f}'.format(t_final-t_inicio))
 		else:
 			print("No hay solución BIS")
@@ -111,39 +109,17 @@ if __name__=="__main__":
 	if(args['busqueda']=='astar'):
 		"""Ejecutar busqueda A* """
 		t_inicio = time.time()
-		node_solucionASTAR=astar_search(map_problem,h1)
+		node_solucionASTAR,nodos_visitados,nodos_en_memoria=astar_search(map_problem,h1)
 		t_final = time.time()
-		nodos_visitados = []
-		nodos_en_memoria=[] #Falta implementar================================================================
 
 		if node_solucionASTAR!=None:
 			print( 'Ruta encontrada: {}'.format(node_solucionASTAR.solution()) )
 			print( 'Costo de la ruta encontrada: {:12.2f}'.format(node_solucionASTAR.path_cost))
 			print( 'Numero de nodos en la ruta encontrada: {:2}'.format(len(node_solucionASTAR.solution())))
-			print( 'Numero de nodos visitados: {:14}'.format(len(nodos_visitados) ) )
-			print( 'Numero de nodos en memoria: {:13}'.format(len(nodos_en_memoria)))
+			print( 'Numero de nodos visitados: {:14}'.format(nodos_visitados) )
+			print( 'Numero de nodos en memoria: {:13}'.format(nodos_en_memoria))
 			print( 'Tiempo de ejecucion: {:20.10f}'.format(t_final-t_inicio))
 		else:
 			print("No hay solucion Astar")
 #____________________________________________________________________________________________________________________________
-"""
-(╯°□°）╯︵ ┻━┻
 
-DATOS DE PRUEBA
-
-1 3 5.0
-1 4 4.0
-1 8 2.0`
-2 5 5.0
-2 7 9.0
-2 8 1.0
-2 10 7.0
-3 6 6.0
-4 5 7.0
-5 6 7.0
-5 9 8.0
-6 9 1.0
-7 10 3.0
-7 8 5.0
-9 10 2.0
-"""
